@@ -19,3 +19,12 @@ type Medoc struct {
 }
 
 type Medocs []Medoc
+
+type OpenMedoc struct {
+    Denomination    	string      `json:"denomination"`
+    CodeCIS     		string      `json:"codeCIS"`
+    Completed   		bool        `json:"completed"`
+    Due         		time.Time   `json:"due"`
+}
+
+type OpenMedocs []OpenMedoc

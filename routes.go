@@ -21,7 +21,13 @@ var routes = Routes{
     Route{
         "Medoc",
         "GET",
-        "/{cis}",
+        "/medoc/{cis}",
         getMedoc,
+    },
+    Route{
+        "OpenMedocs",
+        "GET",
+        "/open/all",
+        getOpenMedocs,
     },
 }
