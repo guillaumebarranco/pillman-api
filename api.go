@@ -16,11 +16,6 @@ func Index(w http.ResponseWriter, r *http.Request) {
     fmt.Fprintln(w, "Welcome!")
 }
 
-
-// func debugType(element interface) {
-//     spew.Dump(reflect.TypeOf(element))
-// }
-
 func getDbUtil() *sql.DB {
 
     user := "root"
@@ -35,7 +30,22 @@ func getDbUtil() *sql.DB {
     return con
 }
 
-func MedocsShow(w http.ResponseWriter, r * http.Request) {
+func makeResponse(items []*Medoc, w http.ResponseWriter) {
+
+    jsonItems := json.NewEncoder(w).Encode(items)
+
+    // debugType(jsonItems)
+    spew.Dump(reflect.TypeOf(jsonItems))
+
+    w.Header().Set("Content-Type", "application/json;charset=UTF-8")
+    w.WriteHeader(http.StatusOK)
+
+    if err := jsonItems; err != nil {
+        panic(err)
+    }
+}
+
+func getMedocs(w http.ResponseWriter, r * http.Request) {
 
     con := getDbUtil()
     defer con.Close()
@@ -68,15 +78,42 @@ func MedocsShow(w http.ResponseWriter, r * http.Request) {
         })
     }
 
-    jsonItems := json.NewEncoder(w).Encode(items)
+    spew.Dump(reflect.TypeOf(items))
 
-    // debugType(jsonItems)
-    spew.Dump(reflect.TypeOf(jsonItems))
+    makeResponse(items, w)
+}
 
-    w.Header().Set("Content-Type", "application/json;charset=UTF-8")
-    w.WriteHeader(http.StatusOK)
+func getMedoc(w http.ResponseWriter, r * http.Request) {
 
-    if err := jsonItems; err != nil {
-        panic(err)
+    con := getDbUtil()
+    defer con.Close()
+
+    vars := mux.Vars(r)
+    cis := vars["cis"]
+
+    rows, err := con.Query("select name, denomination as dci, forme, side_effect as effects from medicaments where cis = "+cis)
+
+    if err != nil { spew.Dump(err) }
+
+    items := make([]*Medoc, 0, 10)
+
+    var name string
+    var dci string
+    var forme string
+    var effects string
+
+    for rows.Next() {
+
+        err := rows.Scan(&name, &dci, &forme, &effects)
+        if err != nil { spew.Dump(err) }
+
+        items = append(items, &Medoc{
+            Name: name,
+            Dci: dci,
+            Forme: forme,
+            Effects: effects,
+        })
     }
+
+    makeResponse(items, w)
 }

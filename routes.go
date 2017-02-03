@@ -16,6 +16,12 @@ var routes = Routes{
         "Index",
         "GET",
         "/all/{limit}",
-        MedocsShow,
+        getMedocs,
+    },
+    Route{
+        "Medoc",
+        "GET",
+        "/{cis}",
+        getMedoc,
     },
 }
