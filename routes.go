@@ -25,9 +25,9 @@ var routes = Routes{
         getMedoc,
     },
     Route{
-        "OpenMedocs",
+        "MajVersion",
         "GET",
-        "/open/all",
-        getOpenMedocs,
+        "/version",
+        getMedocsVersion,
     },
 }

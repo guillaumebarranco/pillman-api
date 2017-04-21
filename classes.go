@@ -9,8 +9,8 @@ import (
 /******************/
 
 type Medoc struct {
-    Name        string      `json:"name"`
     Cis         string      `json:"cis"`
+    Name        string      `json:"name"`
     Dci         string      `json:"dci"`
     Forme       string      `json:"forme"` 
     Effects     string      `json:"effects"`
@@ -20,11 +20,8 @@ type Medoc struct {
 
 type Medocs []Medoc
 
-type OpenMedoc struct {
-    Denomination    	string      `json:"denomination"`
-    CodeCIS     		string      `json:"codeCIS"`
-    Completed   		bool        `json:"completed"`
-    Due         		time.Time   `json:"due"`
+type Maj struct {
+    Version     string  `json:version`
 }
 
-type OpenMedocs []OpenMedoc
+type Majs []Maj

@@ -48,6 +48,22 @@ func makeResponse(items []*Medoc, w http.ResponseWriter) {
     spew.Dump(reflect.TypeOf(jsonItems))
 
     w.Header().Set("Content-Type", "application/json;charset=UTF-8")
+    w.Header().Set("Access-Control-Allow-Origin", "*")
+    w.WriteHeader(http.StatusOK)
+
+    if err := jsonItems; err != nil {
+        panic(err)
+    }
+}
+
+func makeResponseMaj(items []*Maj, w http.ResponseWriter) {
+
+    jsonItems := json.NewEncoder(w).Encode(items)
+
+    // debugType(jsonItems)
+    spew.Dump(reflect.TypeOf(jsonItems))
+
+    w.Header().Set("Content-Type", "application/json;charset=UTF-8")
     w.WriteHeader(http.StatusOK)
 
     if err := jsonItems; err != nil {
@@ -63,7 +79,7 @@ func getMedocs(w http.ResponseWriter, r * http.Request) {
     vars := mux.Vars(r)
     limit := vars["limit"]
 
-    rows, err := con.Query("select name, denomination as dci, cis, forme, side_effect as effects from medicaments limit 0,"+limit)
+    rows, err := con.Query("select cis, name, denomination as dci, forme, side_effect as effects from medicaments limit 0,"+limit)
 
     checkErr(err)
 
@@ -128,69 +144,29 @@ func getMedoc(w http.ResponseWriter, r * http.Request) {
     makeResponse(items, w)
 }
 
-type User struct {
+func getMedocsVersion(w http.ResponseWriter, r * http.Request) {
 
-    // The `json` struct tag maps between the json name
-    // and actual name of the field
-    Denomination string `json:"denomination"`
-}
+    con := getDbUtil()
+    defer con.Close()
 
-func getOpenMedocs(w http.ResponseWriter, r * http.Request) {
+    rows, err := con.Query("select version from maj order by date desc limit 1")
 
-    // var query = "a"
-    // var page = "1"
-    // var limit = "10"
-    // url := "https://www.open-medicaments.fr/api/v1/medicaments?query="+query+"&page="+page+"&limit="+limit
+    checkErr(err)
 
-    url := "https://api.stackexchange.com/2.2/tags?page=1&pagesize=100&order=desc&sort=popular&site=stackoverflow"
+    items := make([]*Maj, 0, 10)
 
-    res, _ := http.Get(url)
-    defer res.Body.Close()
+    var version string
 
-    var data struct {
-        Items []struct {
-            Name                string
-            Count               int
-            Is_required         bool
-            Is_moderator_only   bool
-            Has_synonyms        bool
-        }
+    for rows.Next() {
+        err := rows.Scan(&version)
+        checkErr(err)
+
+        items = append(items, &Maj{
+            Version: version,
+        })
     }
 
-    // var data struct {
-    //     Test []struct {
-    //         Denomination        string
-    //     }
-    // }
+    spew.Dump(reflect.TypeOf(items))
 
-    dec := json.NewDecoder(res.Body)
-    dec.Decode(&data)
-
-    for _, item := range data.Items {
-        fmt.Printf("%s = %d\n", item.Name, item.Count)
-        // fmt.Printf("%s = %d\n", item.Denomination)
-    }
-
+    makeResponseMaj(items, w)
 }
-
-// func getOpenMedocs(w http.ResponseWriter, r * http.Request) {
-//     var data struct {
-//         Items []struct {
-//             Name              string
-//             Count             int
-//             Is_required       bool
-//             Is_moderator_only bool
-//             Has_synonyms      bool
-//         }
-//     }
-
-//     res, _ := http.Get("https://api.stackexchange.com/2.2/tags?page=1&pagesize=100&order=desc&sort=popular&site=stackoverflow")
-//     defer res.Body.Close()
-
-//     dec := json.NewDecoder(res.Body)
-//     dec.Decode(&data)
-
-//     for _, item := range data.Items {
-//         fmt.Printf("%s = %d\n", item.Name, item.Count)
-//     }
-// }
