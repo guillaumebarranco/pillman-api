@@ -3,9 +3,9 @@ package main
 import (
     "encoding/json"
     "fmt"
-    //"io/ioutil"
     "net/http"
     "reflect"
+    "os"
 
     "database/sql"
     _ "github.com/go-sql-driver/mysql"
@@ -18,16 +18,28 @@ func Index(w http.ResponseWriter, r *http.Request) {
     fmt.Fprintln(w, "Welcome!")
 }
 
+type Configuration struct {
+    Host        string
+    User        string
+    Password    string
+    Database    string
+}
+
 func getDbUtil() *sql.DB {
 
-    user := "root"
-    password := ""
-    host := ""
-    database := "medoc"
+    file, _ := os.Open("conf.json")
+    decoder := json.NewDecoder(file)
+    configuration := Configuration{}
+    err := decoder.Decode(&configuration)
+    if err != nil {
+        fmt.Println("error:", err)
+    }
 
-    con, err := sql.Open("mysql", user+":"+password+"@"+host+"/"+database)
+    con, err := sql.Open("mysql", configuration.User+":"+configuration.Password+"@"+configuration.Host+"/"+configuration.Database)
 
-    if err != nil {  }
+    if err != nil {
+        fmt.Println("error:", err)
+    }
 
     return con
 }
