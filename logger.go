@@ -1,3 +1,7 @@
+/*
+ *  Definition of the main app logger util
+ */
+
 package main
 
 import (

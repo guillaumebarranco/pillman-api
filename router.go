@@ -1,3 +1,7 @@
+/*
+ * Router definition and specificities
+ */
+
 package main
 
 import (

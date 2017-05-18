@@ -1,3 +1,7 @@
+/*
+ *  Definitions of all routes for the API
+ */
+
 package main
 
 import "net/http"
@@ -11,7 +15,8 @@ type Route struct {
 
 type Routes []Route
 
-var routes = Routes{
+var routes = Routes {
+
     Route{
         "Index",
         "GET",

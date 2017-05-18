@@ -18,8 +18,8 @@ set GOPATH=C:\wamp\www\go
 
 ## conf.json
 	{
-	    "Host": "",
-	    "User": "",
+		"Host": "",
+		"User": "",
 		"Password": "",
 		"Database": ""
 	}

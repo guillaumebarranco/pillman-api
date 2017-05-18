@@ -1,3 +1,7 @@
+/*
+ *	Main app function creating the router and make calls listening on port 8181
+ */
+
 package main
 
 import (

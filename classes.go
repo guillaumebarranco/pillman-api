@@ -1,3 +1,7 @@
+/*
+ *	This file contains all structures definitions
+ */
+
 package main
 
 import (
@@ -25,3 +29,10 @@ type Maj struct {
 }
 
 type Majs []Maj
+
+type Configuration struct {
+    Host        string
+    User        string
+    Password    string
+    Database    string
+}

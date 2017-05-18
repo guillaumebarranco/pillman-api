@@ -1,8 +1,11 @@
+/*
+ *  Main file of the app, handling Database search and JSON responses
+ */
+
 package main
 
 import (
     "encoding/json"
-    "fmt"
     "net/http"
     "reflect"
     "os"
@@ -11,39 +14,26 @@ import (
     _ "github.com/go-sql-driver/mysql"
     "github.com/davecgh/go-spew/spew"
     "github.com/gorilla/mux"
-    // "github.com/json-iterator/go"
 )
 
-func Index(w http.ResponseWriter, r *http.Request) {
-    fmt.Fprintln(w, "Welcome!")
-}
-
-type Configuration struct {
-    Host        string
-    User        string
-    Password    string
-    Database    string
-}
-
+// Util function for getting database new connection
 func getDbUtil() *sql.DB {
 
     file, _ := os.Open("conf.json")
     decoder := json.NewDecoder(file)
-    configuration := Configuration{}
+    configuration := Configuration{} // Type Configuration defined in classes.go
     err := decoder.Decode(&configuration)
-    if err != nil {
-        fmt.Println("error:", err)
-    }
+
+    checkErr(err)
 
     con, err := sql.Open("mysql", configuration.User+":"+configuration.Password+"@"+configuration.Host+"/"+configuration.Database)
 
-    if err != nil {
-        fmt.Println("error:", err)
-    }
+    checkErr(err)
 
     return con
 }
 
+// Util function for handling error existence
 func checkErr(err interface{}) {
 
     if err != nil {
@@ -56,7 +46,6 @@ func makeResponse(items []*Medoc, w http.ResponseWriter) {
 
     jsonItems := json.NewEncoder(w).Encode(items)
 
-    // debugType(jsonItems)
     spew.Dump(reflect.TypeOf(jsonItems))
 
     w.Header().Set("Content-Type", "application/json;charset=UTF-8")
